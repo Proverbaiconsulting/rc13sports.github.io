@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RC13 Sports landing</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        background: #f3f4f6;
+        color: #1e293b;
+      }
+
+      /* Hero Section */
+      .hero {
+        background: #1e293b;
+        color: white;
+        padding: 80px 20px 60px;
+      }
+
+      .hero h1 {
+        font-size: 38.4px; /* Increased by 20% */
+        margin-bottom: 10px;
+      }
+
+      .hero p {
+        font-size: 21.6px; /* Increased by 20% */
+      }
+
+      .cta-button {
+        display: inline-block;
+        background: #c53030;
+        color: white;
+        padding: 15px 35px;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 8px;
+        margin-top: 20px;
+        cursor: pointer;
+        border: none;
+        transition: background 0.3s ease-in-out;
+      }
+
+      .cta-button:hover {
+        background: #a12727;
+      }
+
+      /* Main Content */
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        max-width: 900px;
+        margin: auto;
+        padding: 50px 20px;
+        gap: 30px;
+      }
+
+      .cta {
+        display: flex;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+      }
+
+      .ebook-container {
+        flex: 1;
+        text-align: center;
+      }
+
+      .ebook-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+
+      .form-container {
+        flex: 1;
+        text-align: center;
+        max-width: 400px;
+      }
+
+      input,
+      textarea {
+        padding: 12px;
+        width: 100%;
+        margin: 10px 0;
+        display: block;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #c53030;
+        outline: none;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+          text-align: center;
+        }
+        .cta {
+          flex-direction: column;
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>RC13 Elite Sports Plan</h1>
+      <p>"Only <span id="remainingSubmissions">20</span> spots left!"</p>
+      <button class="cta-button">Click for Elite plan</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="ebook-container">
+        <img src="ebook-cover.jpg" alt="RC13 sports content" />
+        <p><strong>Stay healthy and reach your full potential</strong></p>
+      </div>
+
+      <div class="form-container">
+        <h2>Get your free 5-day Plan here</h2>
+        <form id="leadForm">
+          <input type="text" id="name" placeholder="Full Name" required />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="text" id="business" placeholder="Age" required />
+          <input type="tel" id="phone" placeholder="Phone Number" required />
+          <textarea
+            id="problem"
+            placeholder="How did you hear about us"
+            required
+          ></textarea>
+          <button type="submit" class="cta-button" id="submitButton">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      let maxSubmissions = 20;
+      let submissions = localStorage.getItem("submissionCount")
+        ? parseInt(localStorage.getItem("submissionCount"))
+        : 0;
+
+      function updateSubmissionCount() {
+        const remaining = maxSubmissions - submissions;
+        document.getElementById("remainingSubmissions").textContent = remaining;
+      }
+
+      document
+        .getElementById("leadForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          if (submissions >= maxSubmissions) {
+            alert("Sorry, we have reached the limit for submissions.");
+            return;
+          }
+
+          const formData = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            business: document.getElementById("business").value,
+            phone: document.getElementById("phone").value,
+            problem: document.getElementById("problem").value,
+          };
+
+          fetch("save_submission.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                localStorage.setItem("submissionCount", ++submissions);
+                updateSubmissionCount();
+                alert("Thank you! Your Free plan has been sent to your email.");
+              }
+            })
+            .catch((error) => console.error("Error saving submission:", error));
+        });
+
+      updateSubmissionCount();
+    </script>
+  </body>
+</html>
