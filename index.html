@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RC13 Sports landing</title>
+    <title>RC13 Sports Landing</title>
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -14,7 +14,6 @@
         color: #1e293b;
       }
 
-      /* Hero Section */
       .hero {
         background: #1e293b;
         color: white;
@@ -22,12 +21,12 @@
       }
 
       .hero h1 {
-        font-size: 38.4px; /* Increased by 20% */
+        font-size: 38.4px;
         margin-bottom: 10px;
       }
 
       .hero p {
-        font-size: 21.6px; /* Increased by 20% */
+        font-size: 21.6px;
       }
 
       .cta-button {
@@ -48,7 +47,6 @@
         background: #a12727;
       }
 
-      /* Main Content */
       .container {
         display: flex;
         justify-content: center;
@@ -103,7 +101,6 @@
         outline: none;
       }
 
-      /* Responsive */
       @media (max-width: 768px) {
         .container {
           flex-direction: column;
@@ -117,14 +114,12 @@
     </style>
   </head>
   <body>
-    <!-- Hero Section -->
     <div class="hero">
       <h1>RC13 Elite Sports Plan</h1>
       <p>"Only <span id="remainingSubmissions">20</span> spots left!"</p>
       <button class="cta-button">Click for Elite plan</button>
     </div>
 
-    <!-- Main Content -->
     <div class="container">
       <div class="ebook-container">
         <img src="ebook-cover.jpg" alt="RC13 sports content" />
@@ -136,66 +131,35 @@
         <form id="leadForm">
           <input type="text" id="name" placeholder="Full Name" required />
           <input type="email" id="email" placeholder="Email" required />
-          <input type="text" id="business" placeholder="Age" required />
+          <input type="text" id="age" placeholder="Age" required />
           <input type="tel" id="phone" placeholder="Phone Number" required />
-          <textarea
-            id="problem"
-            placeholder="How did you hear about us"
-            required
-          ></textarea>
-          <button type="submit" class="cta-button" id="submitButton">
-            Submit
-          </button>
+          <textarea id="referrer" placeholder="How did you hear about us" required></textarea>
+          <button type="submit" class="cta-button">Submit</button>
         </form>
       </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
-      let maxSubmissions = 20;
-      let submissions = localStorage.getItem("submissionCount")
-        ? parseInt(localStorage.getItem("submissionCount"))
-        : 0;
+      const scriptURL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
 
-      function updateSubmissionCount() {
-        const remaining = maxSubmissions - submissions;
-        document.getElementById("remainingSubmissions").textContent = remaining;
-      }
+      document.getElementById("leadForm").addEventListener("submit", function (event) {
+        event.preventDefault();
 
-      document
-        .getElementById("leadForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          if (submissions >= maxSubmissions) {
-            alert("Sorry, we have reached the limit for submissions.");
-            return;
-          }
+        const formData = new FormData();
+        formData.append("name", document.getElementById("name").value);
+        formData.append("email", document.getElementById("email").value);
+        formData.append("age", document.getElementById("age").value);
+        formData.append("phone", document.getElementById("phone").value);
+        formData.append("referrer", document.getElementById("referrer").value);
 
-          const formData = {
-            name: document.getElementById("name").value,
-            email: document.getElementById("email").value,
-            business: document.getElementById("business").value,
-            phone: document.getElementById("phone").value,
-            problem: document.getElementById("problem").value,
-          };
-
-          fetch("save_submission.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
+        fetch(scriptURL, { method: "POST", body: formData })
+          .then(response => response.text())
+          .then(data => {
+            alert("Thank you! Your Free plan has been sent to your email.");
+            document.getElementById("leadForm").reset();
           })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.status === "success") {
-                localStorage.setItem("submissionCount", ++submissions);
-                updateSubmissionCount();
-                alert("Thank you! Your Free plan has been sent to your email.");
-              }
-            })
-            .catch((error) => console.error("Error saving submission:", error));
-        });
-
-      updateSubmissionCount();
+          .catch(error => console.error("Error!", error));
+      });
     </script>
   </body>
 </html>
